@@ -1,0 +1,15 @@
+.receipt{
+    padding-top: 50px;
+}
+.am-list-item .am-input-control input{
+    text-align: right;
+}
+
+.caleRate{
+    padding-bottom: 15px;
+    text-align: right;
+    color: gray;
+    padding-right: 15px;
+    font-size: 14px;
+    line-height: 1.7;
+}
