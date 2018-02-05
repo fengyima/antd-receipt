@@ -1,3 +1,4 @@
+@import "./base.css";
 .receipt{
     padding-top: 50px;
 }
@@ -12,4 +13,23 @@
     padding-right: 15px;
     font-size: 14px;
     line-height: 1.7;
+}
+.checkbox .am-list-body{
+    text-align: left;
+}
+
+.am-checkbox-wrapper a{
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.errTip{
+    display: none;
+}
+
+.am-input-error + .errTip{
+    display: block;
+    padding: 5px 15px;
+    text-align: right;
+    color: red;
 }
