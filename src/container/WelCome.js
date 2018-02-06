@@ -2,7 +2,8 @@ import React, {Component} from "react";
 import {Link} from "react-router-dom";
 import {Button, WingBlank, WhiteSpace, Checkbox} from "antd-mobile";
 import "../css/welcome.css";
-import logo from "../logo.svg";
+import logo from "../images/icon.jpg";
+
 export default class WelCome extends Component {
     constructor(props) {
         super(props);
@@ -37,7 +38,7 @@ export default class WelCome extends Component {
                     onChange={e => console.log("checkbox", e)}
                 >
                     &nbsp;
-                    <Link to="/agreement">同意《用户协议》</Link>
+                    <Link to="/userAgr">同意《用户协议》</Link>
                 </Checkbox>
             </WingBlank>
         );

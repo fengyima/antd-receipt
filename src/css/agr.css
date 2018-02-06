@@ -1,0 +1,20 @@
+@import "./base.css";
+.agreement{
+    padding: 5px 15px;
+}
+
+.title{
+    text-align: center;
+}
+
+.detail{
+    margin-bottom: 15px;;
+}
+
+.text-right{
+    text-align: right;
+}
+
+.red{
+    color: rgb(202, 17, 17);
+}

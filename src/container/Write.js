@@ -297,8 +297,8 @@ export default class Write extends Component {
                         }}
                     >
                         &nbsp;同意
-                        <Link to="/agreement">《居间服务协议》</Link>
-                        <Link to="/agreement">《借款协议》</Link>
+                        <Link to="/serviceAgr">《居间服务协议》</Link>
+                        <Link to="/borrowAgr">《借款协议》</Link>
                     </AgreeItem>
                 </List>
                 <WingBlank>
