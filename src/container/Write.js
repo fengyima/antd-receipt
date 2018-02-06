@@ -1,20 +1,12 @@
 import React, {Component} from "react";
 import {Link} from "react-router-dom";
-import {
-    List,
-    InputItem,
-    Picker,
-    DatePicker,
-    Checkbox,
-    WhiteSpace,
-    WingBlank,
-    Button
-} from "antd-mobile";
+import {List, InputItem, Picker, Checkbox, WhiteSpace, WingBlank, Button} from "antd-mobile";
 import "../css/receipt.css";
 
 import {RATE, PURPOST} from "../config/rate.config";
 import {regObj} from "../config/reg.config";
 import {dateFormat} from "../lib/tools";
+import Signature from "./Signature";
 
 const AgreeItem = Checkbox.AgreeItem;
 
@@ -23,6 +15,8 @@ const nowTimeStamp = Date.now();
 function calcInterest(rate, count, cycle) {
     return parseFloat(rate, 10) * count * cycle / 365;
 }
+
+let signInstance;
 
 export default class Write extends Component {
     constructor(props) {
@@ -45,9 +39,12 @@ export default class Write extends Component {
             interest: 0.0,
             purpostValue: PURPOST[0][0].value,
             isBtnDisable: true,
-            AgreeItemChecked: true
+            AgreeItemChecked: true,
+            layerShow: false
         };
     }
+
+    componentDidMount() {}
 
     onBorrowerAmount(borrowerAmount) {
         let {rateValue, borrowerCycle} = this.state;
@@ -94,14 +91,6 @@ export default class Write extends Component {
             } = this.state;
 
             let isBtnDisable = true;
-            console.log(
-                !borrowerNameErr,
-                !borrowerIdErr,
-                !lendersErr,
-                !borrowerAmountErr,
-                !borrowerCycleErr,
-                AgreeItemChecked
-            );
 
             if (
                 !borrowerNameErr &&
@@ -121,6 +110,29 @@ export default class Write extends Component {
         }, 100);
     }
 
+    showLayer(layerShow) {
+        this.setState(
+            {
+                layerShow
+            },
+            () => {
+                if (!signInstance) {
+                    signInstance = new Signature(this.refs.canvas);
+                    signInstance.init();
+                }
+            }
+        );
+    }
+
+    getSignatureImg() {
+        let img = signInstance.save();
+        console.log(img);
+    }
+
+    clearSignature() {
+        signInstance.clear();
+    }
+
     render() {
         let {
             rateValue,
@@ -133,7 +145,8 @@ export default class Write extends Component {
             borrowerAmountErr,
             borrowerCycleErr,
             borrowDate,
-            repaymentDate
+            repaymentDate,
+            layerShow
         } = this.state;
         let {history} = this.props;
         return (
@@ -167,17 +180,14 @@ export default class Write extends Component {
                         身份证号
                     </InputItem>
                     <div className="errTip">请输入正确的18位省份证号码！</div>
-                    <div className="am-list-item am-input-item am-list-item-middle">
+                    <div
+                        className="am-list-item am-input-item am-list-item-middle"
+                        refs={"signature"}
+                    >
                         <div className="am-list-line">
                             <div className="am-input-label am-input-label-5">电子签名</div>
-                            <div className="am-input-control">
-                                <input
-                                    type="text"
-                                    placeholder="点击签署"
-                                    maxLength="18"
-                                    value=""
-                                    disabled
-                                />
+                            <div className="signatureTip" onClick={this.showLayer.bind(this, true)}>
+                                点击签署
                             </div>
                         </div>
                     </div>
@@ -314,6 +324,40 @@ export default class Write extends Component {
                     </Button>
                     <WhiteSpace />
                 </WingBlank>
+                <div className={layerShow ? "layer" : "layer hide"}>
+                    <div className="signature">
+                        <canvas className="canvas" ref="canvas" />
+                        <WingBlank>
+                            <WhiteSpace />
+                            <Button
+                                inline
+                                style={{marginRight: "15px"}}
+                                onClick={this.showLayer.bind(this, false)}
+                            >
+                                取消
+                            </Button>
+                            <Button
+                                type={"warning"}
+                                inline
+                                style={{marginRight: "15px"}}
+                                onClick={this.clearSignature}
+                            >
+                                擦除
+                            </Button>
+                            <Button
+                                type={"primary"}
+                                inline
+                                onClick={() => {
+                                    this.showLayer(false);
+                                    this.getSignatureImg();
+                                }}
+                            >
+                                确定
+                            </Button>
+                            <WhiteSpace />
+                        </WingBlank>
+                    </div>
+                </div>
             </section>
         );
     }

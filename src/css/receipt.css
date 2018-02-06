@@ -1,35 +1,96 @@
 @import "./base.css";
-.receipt{
+.receipt {
+    position: relative;
     padding-top: 50px;
 }
-.am-list-item .am-input-control input{
+
+.am-list-item .am-input-control input {
     text-align: right;
 }
 
-.caleRate{
-    padding-bottom: 15px;
+.caleRate {
+    padding-bottom: 5px;
     text-align: right;
     color: gray;
     padding-right: 15px;
     font-size: 14px;
     line-height: 1.7;
 }
-.checkbox .am-list-body{
+
+.checkbox .am-list-body {
     text-align: left;
 }
 
-.am-checkbox-wrapper a{
+.am-input-label{
+    color: #000 !important;
+}
+
+.am-checkbox-wrapper a {
     display: inline-block;
     vertical-align: middle;
 }
 
-.errTip{
+.errTip {
     display: none;
 }
 
-.am-input-error + .errTip{
+.am-input-error+.errTip {
     display: block;
     padding: 5px 15px;
     text-align: right;
     color: red;
+}
+
+.layer {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.signature {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 7rem;
+    padding: 0.3rem 0 0;
+    background: #ccc;
+    -webkit-transform: translate3d(-50%, -50%, 0);
+    box-sizing: border-box;
+    border-radius: 8px;
+}
+
+.canvas {
+    width: 6.6rem;
+    height: 3.3rem;
+    background-color: white;
+}
+
+.signatureTip {
+    text-align: right;
+    color: #000;
+    font-size: 17px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 100%;
+    padding: 2px 0;
+    border: 0;
+    background-color: transparent;
+    line-height: 1;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    color: #bbb;
+    line-height: 1.2;
+}
+.signatureTip img{
+    width: 100px;
+    height: 40px;
+    vertical-align: middle;
+}
+.hide{
+    display: none;
 }

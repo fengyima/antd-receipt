@@ -1,20 +1,87 @@
 @import "./base.css";
-.agreement{
+.agreement {
     padding: 5px 15px;
+    text-align: left
 }
 
-.title{
+.title {
     text-align: center;
 }
 
-.detail{
-    margin-bottom: 15px;;
+.detail {
+    margin-bottom: 15px;
+    ;
 }
 
-.text-right{
+.text-right {
     text-align: right;
 }
 
-.red{
-    color: rgb(202, 17, 17);
+.red {
+    color: rgb(228, 18, 18);
+}
+
+.header {
+    position: relative;
+    padding: 15px 0 10px;
+    text-align: right;
+}
+
+.header::after {
+    content: "";
+    clear: both;
+    height: 100%;
+    visibility: hidden;
+    overflow: hidden;
+}
+
+.header .status {
+    float: left;
+}
+
+.header .status .img {
+    display: inline-block;
+    vertical-align: middle;
+    width: 90px;
+    height: 40px;
+    background: url(../images/status.png) no-repeat center/100%;
+    -webkit-transform: rotate(-25deg);
+    transform: rotate(-25deg);
+}
+
+.header .protolNum {
+    /* float: right; */
+    line-height: 40px;
+}
+
+.content {
+    line-height: 3;
+}
+
+.content .title {
+    text-align: center;
+    margin: 0;
+}
+
+.content .space {
+    display: inline-block;
+    width: 100px;
+}
+
+.tip {
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px dotted #333;
+}
+
+.highlight {
+    color: rgb(228, 18, 18);
+    font-weight: bold;
+}
+
+.detail .img {
+    display: inline-block;
+    vertical-align: middle;
+    width: 90px;
+    height: 40px;
 }
