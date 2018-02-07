@@ -1,7 +1,7 @@
 @import "./base.css";
 .receipt {
     position: relative;
-    padding-top: 50px;
+    padding-top: 20px;
 }
 
 .am-list-item .am-input-control input {
@@ -21,7 +21,7 @@
     text-align: left;
 }
 
-.am-input-label{
+.am-input-label {
     color: #000 !important;
 }
 
@@ -30,17 +30,33 @@
     vertical-align: middle;
 }
 
+.signatureTip + .am-input-error-extra {
+    display: none;
+    padding-left: 5px;
+    height: 21px;
+    width: 21px;
+    margin-left: 6px;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20width%3D'18'%20height%3D'18'%20vi…20-9.000000)%20'%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+    background-size: 21px auto;
+}
+
+.am-input-error .signatureTip + .am-input-error-extra {
+    display: block;
+}
 .errTip {
     display: none;
 }
 
-.am-input-error+.errTip {
+.am-input-error + .errTip {
     display: block;
     padding: 5px 15px;
     text-align: right;
     color: red;
 }
 
+.am-list-item + .errTip {
+    padding-bottom: 15px;
+}
 .layer {
     position: fixed;
     width: 100%;
@@ -86,11 +102,11 @@
     color: #bbb;
     line-height: 1.2;
 }
-.signatureTip img{
+.signatureTip img {
     width: 100px;
     height: 40px;
     vertical-align: middle;
 }
-.hide{
+.hide {
     display: none;
 }

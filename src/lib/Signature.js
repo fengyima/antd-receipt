@@ -1,4 +1,3 @@
-let draw;
 let preHandler = function(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -17,26 +16,23 @@ export default class Signature {
         };
     }
     init(btn) {
-        var that = this;
-
-        this.canvas.addEventListener("touchstart", function(event) {
+        this.canvas.addEventListener("touchstart", event => {
             preHandler(event);
             // document.addEventListener("touchstart", preHandler, false);
-            that.drawBegin(event);
+            this.drawBegin(event);
         });
-        this.canvas.addEventListener("touchmove", function(event) {
+        this.canvas.addEventListener("touchmove", event => {
             preHandler(event);
-            that.drawing(event);
+            this.drawing(event);
         });
-        this.canvas.addEventListener("touchend", function(event) {
+        this.canvas.addEventListener("touchend", event => {
             preHandler(event);
             // document.addEventListener("touchend", preHandler, false);
-            that.drawEnd();
+            this.drawEnd();
         });
         this.clear(btn);
     }
     drawBegin(e) {
-        var that = this;
         window.getSelection()
             ? window.getSelection().removeAllRanges()
             : document.selection.empty();

@@ -106,3 +106,11 @@ export function dateFormat(date, format) {
     }
     return date;
 }
+
+export function isCanvasBlank(canvas) {
+    var blank = document.createElement('canvas');
+    blank.width = canvas.width;
+    blank.height = canvas.height;
+
+    return canvas.toDataURL() === blank.toDataURL();
+}

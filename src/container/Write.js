@@ -5,8 +5,9 @@ import "../css/receipt.css";
 
 import {RATE, PURPOST} from "../config/rate.config";
 import {regObj} from "../config/reg.config";
-import {dateFormat} from "../lib/tools";
-import Signature from "./Signature";
+import {dateFormat, isCanvasBlank} from "../lib/tools";
+import Signature from "../lib/Signature";
+import "whatwg-fetch";
 
 const AgreeItem = Checkbox.AgreeItem;
 
@@ -40,11 +41,18 @@ export default class Write extends Component {
             purpostValue: PURPOST[0][0].value,
             isBtnDisable: true,
             AgreeItemChecked: true,
-            layerShow: false
+            layerShow: false,
+            signatureStr: ""
         };
     }
 
-    componentDidMount() {}
+    componentDidMount() {
+        // this.addSinatureErrTip(true);
+    }
+
+    postData() {
+        console.log();
+    }
 
     onBorrowerAmount(borrowerAmount) {
         let {rateValue, borrowerCycle} = this.state;
@@ -82,23 +90,25 @@ export default class Write extends Component {
     checkAllStatu() {
         setTimeout(() => {
             let {
-                borrowerNameErr,
-                borrowerIdErr,
-                lendersErr,
-                borrowerAmountErr,
-                borrowerCycleErr,
-                AgreeItemChecked
+                borrowerName,
+                borrowerId,
+                lenders,
+                borrowerAmount,
+                borrowerCycle,
+                AgreeItemChecked,
+                signatureStr
             } = this.state;
 
             let isBtnDisable = true;
 
             if (
-                !borrowerNameErr &&
-                !borrowerIdErr &&
-                !lendersErr &&
-                !borrowerAmountErr &&
-                !borrowerCycleErr &&
-                AgreeItemChecked
+                !!borrowerName &&
+                !!borrowerId &&
+                !!lenders &&
+                !!borrowerAmount &&
+                !!borrowerCycle &&
+                AgreeItemChecked &&
+                signatureStr !== ""
             ) {
                 isBtnDisable = false;
             } else {
@@ -126,11 +136,30 @@ export default class Write extends Component {
 
     getSignatureImg() {
         let img = signInstance.save();
-        console.log(img);
+        let isBlank = isCanvasBlank(this.refs.canvas);
+
+        this.setState({
+            signatureStr: isBlank ? "" : img
+        });
+        if(isBlank){
+            this.addSinatureErrTip(true);
+        }else{
+            this.addSinatureErrTip(false);
+        }
     }
 
     clearSignature() {
         signInstance.clear();
+    }
+
+    addSinatureErrTip(bool) {
+        //
+        let container = this.refs.signatureContainer;
+        if (bool) {
+            container.classList.add("am-input-error");
+        } else {
+            container.classList.remove("am-input-error");
+        }
     }
 
     render() {
@@ -146,7 +175,8 @@ export default class Write extends Component {
             borrowerCycleErr,
             borrowDate,
             repaymentDate,
-            layerShow
+            layerShow,
+            signatureStr
         } = this.state;
         let {history} = this.props;
         return (
@@ -181,14 +211,19 @@ export default class Write extends Component {
                     </InputItem>
                     <div className="errTip">请输入正确的18位省份证号码！</div>
                     <div
-                        className="am-list-item am-input-item am-list-item-middle"
-                        refs={"signature"}
+                        className="am-list-item am-input-item am-list-item-middle am-list-item-middle-disable"
+                        ref={"signatureContainer"}
                     >
                         <div className="am-list-line">
                             <div className="am-input-label am-input-label-5">电子签名</div>
                             <div className="signatureTip" onClick={this.showLayer.bind(this, true)}>
-                                点击签署
+                                {signatureStr == "" ? (
+                                    <span>点击签署</span>
+                                ) : (
+                                    <img src={signatureStr} />
+                                )}
                             </div>
+                            <div className="am-input-error-extra" />
                         </div>
                     </div>
                     <div className="errTip">请签名！</div>
@@ -316,6 +351,7 @@ export default class Write extends Component {
                     <Button
                         type={"primary"}
                         onClick={() => {
+                            console.log("primary click")
                             history.push("/write");
                         }}
                         disabled={isBtnDisable}
@@ -332,7 +368,10 @@ export default class Write extends Component {
                             <Button
                                 inline
                                 style={{marginRight: "15px"}}
-                                onClick={this.showLayer.bind(this, false)}
+                                onClick={() => {
+                                    this.showLayer(false);
+                                    this.addSinatureErrTip(true);
+                                }}
                             >
                                 取消
                             </Button>
@@ -350,6 +389,7 @@ export default class Write extends Component {
                                 onClick={() => {
                                     this.showLayer(false);
                                     this.getSignatureImg();
+                                    this.checkAllStatu();
                                 }}
                             >
                                 确定
