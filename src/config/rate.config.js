@@ -1,5 +1,5 @@
 export const RATE = (function() {
-    let target = 20;
+    let target = 24;
     let base = 1;
     let result = [];
     for (let i = 1; i <= target; i++) {

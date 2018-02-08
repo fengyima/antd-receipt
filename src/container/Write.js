@@ -403,7 +403,7 @@ export default class Write extends Component {
                         }}
                         onOk={v => {
                             let value = v[0];
-                            sessionStorage.setItem("rateValue", value);
+                            sessionStorage.setItem("purpostValue", value);
                             this.setState({
                                 purpostValue: value
                             });
