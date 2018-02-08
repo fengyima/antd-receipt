@@ -63,7 +63,7 @@ export default class Write extends Component {
             repaymentDate,
             purpostValue
         } = this.state;
-        
+
         let body = {
             datas: {
                 borrower: borrowerName,
@@ -91,8 +91,9 @@ export default class Write extends Component {
             .then(res => {
                 return res.json();
             })
-            .then(data => {
-                console.log(data);
+            .then(json => {
+                let datas = json.datas;
+                sessionStorage.setItem("iouNumber", datas.iouNumber);
             });
 
         // history.push("/write");
@@ -375,6 +376,15 @@ export default class Write extends Component {
                     >
                         <List.Item arrow="horizontal">用途</List.Item>
                     </Picker>
+                    <div
+                        className="am-list-item am-input-item am-list-item-middle am-list-item-middle-disable"
+                        ref={"signatureContainer"}
+                    >
+                        <div className="am-list-line">
+                            <div className="am-input-label am-input-label-5">服务费用</div>
+                            <div className="signatureTip highlight">￥9.9</div>
+                        </div>
+                    </div>
                 </List>
                 <List className="checkbox">
                     <AgreeItem
