@@ -209,7 +209,7 @@ export default class Write extends Component {
                     >
                         身份证号
                     </InputItem>
-                    <div className="errTip">请输入正确的18位省份证号码！</div>
+                    <div className="errTip">请输入正确的18位身份证号码！</div>
                     <div
                         className="am-list-item am-input-item am-list-item-middle am-list-item-middle-disable"
                         ref={"signatureContainer"}
@@ -217,10 +217,10 @@ export default class Write extends Component {
                         <div className="am-list-line">
                             <div className="am-input-label am-input-label-5">电子签名</div>
                             <div className="signatureTip" onClick={this.showLayer.bind(this, true)}>
-                                {signatureStr == "" ? (
+                                {signatureStr === "" ? (
                                     <span>点击签署</span>
                                 ) : (
-                                    <img src={signatureStr} />
+                                    <img src={signatureStr} alt="signature" />
                                 )}
                             </div>
                             <div className="am-input-error-extra" />
@@ -351,7 +351,6 @@ export default class Write extends Component {
                     <Button
                         type={"primary"}
                         onClick={() => {
-                            console.log("primary click")
                             history.push("/write");
                         }}
                         disabled={isBtnDisable}

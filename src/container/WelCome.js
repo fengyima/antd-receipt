@@ -8,26 +8,27 @@ export default class WelCome extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            type: "primary"
+            btnDisable: false
         };
     }
     render() {
-        let {type} = this.state;
+        let {btnDisable} = this.state;
         let {history} = this.props;
 
         return (
             <WingBlank>
                 <div className="logoRow">
-                    <img className="logo" src={logo} />
+                    <img className="logo" src={logo} alt="写协议" />
                     <h3 className="title">写协议</h3>
                     <p className="desc">为你提供在线的电子协议</p>
                 </div>
                 <WhiteSpace />
                 <Button
-                    type={type}
+                    type={"primary"}
                     onClick={() => {
                         history.push("/write");
                     }}
+                    disabled={btnDisable}
                 >
                     开始写协议
                 </Button>
@@ -35,10 +36,14 @@ export default class WelCome extends Component {
                 <Checkbox
                     className="my-checkbox"
                     defaultChecked={true}
-                    onChange={e => console.log("checkbox", e)}
+                    onChange={e => {
+                        this.setState({
+                            btnDisable: !e.target.checked
+                        });
+                    }}
                 >
-                    &nbsp;
-                    <Link to="/userAgr">同意《用户协议》</Link>
+                    &nbsp;同意
+                    <Link to="/userAgr">《用户协议》</Link>
                 </Checkbox>
             </WingBlank>
         );

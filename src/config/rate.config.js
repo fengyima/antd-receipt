@@ -4,8 +4,8 @@ export const RATE = (function() {
     let result = [];
     for (let i = 1; i <= target; i++) {
         result.push({
-            value: base * i / 10 + "%",
-            label: base * i / 10 + "%"
+            value: base * i + "%",
+            label: base * i + "%"
         });
     }
     return [result];

@@ -32,7 +32,7 @@
 
 .signatureTip + .am-input-error-extra {
     display: none;
-    padding-left: 5px;
+    padding-left: 6px;
 }
 
 .am-input-error .signatureTip + .am-input-error-extra {
