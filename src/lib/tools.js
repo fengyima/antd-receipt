@@ -114,3 +114,27 @@ export function isCanvasBlank(canvas) {
 
     return canvas.toDataURL() === blank.toDataURL();
 }
+/**
+ * 是否为window对象
+ * @param {any} obj
+ */
+export function isWindow(obj) {
+    return obj && obj !== null && obj == obj.window;
+}
+
+/**
+ * 是否为对象
+ * @param {any} obj
+ */
+export function isObject(obj) {
+    return type(obj) === "object";
+}
+
+/**
+ * 是否为纯对象
+ * 非window对象且继承自Object
+ * @param {*} obj
+ */
+export function isPlainObject(obj) {
+    return obj && isObject(obj) && !isWindow(obj) && Object.getPrototypeOf(obj) === Object.prototype;
+}
