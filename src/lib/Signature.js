@@ -8,12 +8,24 @@ export default class Signature {
         this.canvas = el;
         this.cxt = this.canvas.getContext("2d");
         this.stage_info = this.canvas.getBoundingClientRect();
+        this.width = this.canvas.width;
+        this.height = this.canvas.height;
         this.path = {
             beginX: 0,
             beginY: 0,
             endX: 0,
             endY: 0
         };
+    }
+    defaultImg(src) {
+        if (!src) {
+            return;
+        }
+        let $img = document.createElement("img");
+        $img.onload = () => {
+            this.cxt.drawImage($img, 0, 0);
+        };
+        $img.src = src;
     }
     init(btn) {
         this.canvas.addEventListener("touchstart", event => {

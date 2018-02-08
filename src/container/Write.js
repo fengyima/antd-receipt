@@ -5,7 +5,7 @@ import "../css/receipt.css";
 
 import {RATE, PURPOST} from "../config/rate.config";
 import {regObj} from "../config/reg.config";
-import {dateFormat, isCanvasBlank} from "../lib/tools";
+import {dateFormat, isCanvasBlank, calcInterest} from "../lib/tools";
 import Signature from "../lib/Signature";
 import "whatwg-fetch";
 
@@ -13,44 +13,53 @@ const AgreeItem = Checkbox.AgreeItem;
 
 const nowTimeStamp = Date.now();
 
-function calcInterest(rate, count, cycle) {
-    return parseFloat(rate, 10) * count * cycle / 365;
-}
-
 let signInstance;
 
 export default class Write extends Component {
     constructor(props) {
         super(props);
+        let borrowerCycle = sessionStorage.getItem("borrowerCycle");
+        let repaymentDate = nowTimeStamp + ((borrowerCycle || 1) - 1) * 3600 * 24 * 1000;
         this.state = {
-            borrowerName: "",
+            // borrowerName: "",
             borrowerNameErr: false,
-            borrowerId: "",
+            // borrowerId: "",
             borrowerIdErr: false,
-            borrowerSignature: "",
-            lenders: "",
+            // lenders: "",
             lendersErr: false,
-            borrowerAmount: 0,
+            // borrowerAmount: 0,
             borrowerAmountErr: false,
-            borrowerCycle: 0,
+            // borrowerCycle: 0,
             borrowerCycleErr: false,
             borrowDate: nowTimeStamp,
-            repaymentDate: nowTimeStamp,
-            rateValue: RATE[0][0].value,
-            interest: 0.0,
-            purpostValue: PURPOST[0][0].value,
+            repaymentDate,
+            // rateValue: RATE[0][0].value,
+            // interest: 0.0,
+            // purpostValue: PURPOST[0][0].value,
             isBtnDisable: true,
             AgreeItemChecked: true,
             layerShow: false,
-            signatureStr: ""
+            // signatureStr: "",
+
+            borrowerName: sessionStorage.getItem("borrowerName"),
+            borrowerId: sessionStorage.getItem("borrowerId"),
+            lenders: sessionStorage.getItem("lenders"),
+            borrowerAmount: sessionStorage.getItem("borrowerAmount"),
+            borrowerCycle,
+            rateValue: sessionStorage.getItem("rateValue") || RATE[0][0].value,
+            interest: sessionStorage.getItem("interest"),
+            purpostValue: sessionStorage.getItem("purpostValue") || PURPOST[0][0].value,
+            signatureStr: sessionStorage.getItem("signatureStr") || ""
         };
     }
 
     componentDidMount() {
         // this.postData();
+        this.checkAllStatu();
     }
 
     postData() {
+        let {history} = this.props;
         let {
             borrowerName,
             borrowerId,
@@ -125,11 +134,18 @@ export default class Write extends Component {
     }
 
     checkInput(target, value, type) {
+        let isErr = !regObj[type].test(value);
         let newState = {
             [target]: value,
-            [target + "Err"]: !regObj[type].test(value)
+            [target + "Err"]: isErr
         };
+
         this.setState(newState);
+        if (!isErr) {
+            sessionStorage.setItem(target, value);
+        } else {
+            sessionStorage.removeItem(target, value);
+        }
     }
 
     checkAllStatu() {
@@ -162,7 +178,7 @@ export default class Write extends Component {
             this.setState({
                 isBtnDisable
             });
-        }, 100);
+        }, 10);
     }
 
     showLayer(layerShow) {
@@ -174,6 +190,7 @@ export default class Write extends Component {
                 if (!signInstance) {
                     signInstance = new Signature(this.refs.canvas);
                     signInstance.init();
+                    signInstance.defaultImg(this.state.signatureStr);
                 }
             }
         );
@@ -190,17 +207,20 @@ export default class Write extends Component {
             this.addSinatureErrTip(true);
         } else {
             this.addSinatureErrTip(false);
+            sessionStorage.setItem("signatureStr", img);
         }
     }
 
     clearSignature() {
         signInstance.clear();
+        sessionStorage.removeItem("signatureStr");
     }
 
     addSinatureErrTip(bool) {
         //
         let container = this.refs.signatureContainer;
-        if (bool) {
+        let isBlank = isCanvasBlank(this.refs.canvas);
+        if (isBlank) {
             container.classList.add("am-input-error");
         } else {
             container.classList.remove("am-input-error");
@@ -221,9 +241,14 @@ export default class Write extends Component {
             borrowDate,
             repaymentDate,
             layerShow,
-            signatureStr
+            signatureStr,
+            borrowerName,
+            borrowerId,
+            lenders,
+            borrowerAmount,
+            borrowerCycle
         } = this.state;
-        let {history} = this.props;
+
         return (
             <section className="receipt">
                 <List>
@@ -237,6 +262,7 @@ export default class Write extends Component {
                             this.checkAllStatu();
                             this.checkInput("borrowerName", v, "name");
                         }}
+                        defaultValue={borrowerName}
                     >
                         借款人
                     </InputItem>
@@ -248,9 +274,11 @@ export default class Write extends Component {
                         maxLength="18"
                         error={borrowerIdErr}
                         onBlur={v => {
+                            console.log(v);
                             this.checkAllStatu();
                             this.checkInput("borrowerId", v, "id");
                         }}
+                        defaultValue={borrowerId}
                     >
                         身份证号
                     </InputItem>
@@ -284,6 +312,7 @@ export default class Write extends Component {
                             this.checkInput("lenders", v, "name");
                             this.checkAllStatu();
                         }}
+                        defaultValue={lenders}
                     >
                         出借人
                     </InputItem>
@@ -301,6 +330,7 @@ export default class Write extends Component {
                             this.checkAllStatu();
                         }}
                         error={borrowerAmountErr}
+                        defaultValue={borrowerAmount}
                     >
                         借款金额
                     </InputItem>
@@ -311,6 +341,7 @@ export default class Write extends Component {
                         clear={true}
                         maxLength="3"
                         error={borrowerCycleErr}
+                        defaultValue={borrowerCycle}
                         onBlur={v => {
                             this.onBorrowerCycle(v);
                             this.checkInput("borrowerCycle", v, "cycle");
@@ -333,9 +364,11 @@ export default class Write extends Component {
                             this.onRateChange(v[0]);
                         }}
                         onOk={v => {
+                            let value = v[0];
                             this.setState({
-                                rateValue: v[0]
+                                rateValue: value
                             });
+                            sessionStorage.setItem("rateValue", value);
                         }}
                     >
                         <List.Item arrow="horizontal">利率</List.Item>
@@ -363,23 +396,22 @@ export default class Write extends Component {
                         cascade={false}
                         cols={1}
                         value={[purpostValue]}
-                        onChange={v =>
+                        onChange={v => {
                             this.setState({
                                 purpostValue: v[0]
-                            })
-                        }
-                        onOk={v =>
+                            });
+                        }}
+                        onOk={v => {
+                            let value = v[0];
+                            sessionStorage.setItem("rateValue", value);
                             this.setState({
-                                purpostValue: v[0]
-                            })
-                        }
+                                purpostValue: value
+                            });
+                        }}
                     >
                         <List.Item arrow="horizontal">用途</List.Item>
                     </Picker>
-                    <div
-                        className="am-list-item am-input-item am-list-item-middle am-list-item-middle-disable"
-                        ref={"signatureContainer"}
-                    >
+                    <div className="am-list-item am-input-item am-list-item-middle am-list-item-middle-disable">
                         <div className="am-list-line">
                             <div className="am-input-label am-input-label-5">服务费用</div>
                             <div className="signatureTip highlight">￥9.9</div>

@@ -108,7 +108,7 @@ export function dateFormat(date, format) {
 }
 
 export function isCanvasBlank(canvas) {
-    var blank = document.createElement('canvas');
+    var blank = document.createElement("canvas");
     blank.width = canvas.width;
     blank.height = canvas.height;
 
@@ -119,7 +119,7 @@ export function isCanvasBlank(canvas) {
  * @param {any} obj
  */
 export function isWindow(obj) {
-    return obj && obj !== null && obj == obj.window;
+    return obj && obj !== null && obj === obj.window;
 }
 
 /**
@@ -136,5 +136,11 @@ export function isObject(obj) {
  * @param {*} obj
  */
 export function isPlainObject(obj) {
-    return obj && isObject(obj) && !isWindow(obj) && Object.getPrototypeOf(obj) === Object.prototype;
+    return (
+        obj && isObject(obj) && !isWindow(obj) && Object.getPrototypeOf(obj) === Object.prototype
+    );
+}
+
+export function calcInterest(rate, count, cycle) {
+    return parseFloat(rate, 10) * count * cycle / 365 / 100;
 }
