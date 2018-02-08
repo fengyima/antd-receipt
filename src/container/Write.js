@@ -47,11 +47,55 @@ export default class Write extends Component {
     }
 
     componentDidMount() {
-        // this.addSinatureErrTip(true);
+        // this.postData();
     }
 
     postData() {
-        console.log();
+        let {
+            borrowerName,
+            borrowerId,
+            signatureStr,
+            lenders,
+            borrowerAmount,
+            borrowerCycle,
+            rateValue,
+            borrowDate,
+            repaymentDate,
+            purpostValue
+        } = this.state;
+        
+        let body = {
+            datas: {
+                borrower: borrowerName,
+                borrwoerId: borrowerId,
+                autograph: signatureStr,
+                lender: lenders,
+                borrowMoney: borrowerAmount,
+                borrowCycle: borrowerCycle,
+                interestRate: parseInt(rateValue, 10),
+                borrowDate: borrowDate,
+                repaymentDate: repaymentDate,
+                purpose: purpostValue,
+                serviceCharge: 9.9,
+                openId: "",
+                iouNumber: ""
+            }
+        };
+
+        fetch("http://www.xiexieyi.com/mz/receiveMessage/iouService/createIou.do", {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            body: JSON.stringify(body)
+        })
+            .then(res => {
+                return res.json();
+            })
+            .then(data => {
+                console.log(data);
+            });
+
+        // history.push("/write");
     }
 
     onBorrowerAmount(borrowerAmount) {
@@ -141,9 +185,9 @@ export default class Write extends Component {
         this.setState({
             signatureStr: isBlank ? "" : img
         });
-        if(isBlank){
+        if (isBlank) {
             this.addSinatureErrTip(true);
-        }else{
+        } else {
             this.addSinatureErrTip(false);
         }
     }
@@ -351,7 +395,7 @@ export default class Write extends Component {
                     <Button
                         type={"primary"}
                         onClick={() => {
-                            history.push("/write");
+                            this.postData();
                         }}
                         disabled={isBtnDisable}
                     >
