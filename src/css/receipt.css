@@ -33,11 +33,6 @@
 .signatureTip + .am-input-error-extra {
     display: none;
     padding-left: 5px;
-    height: 21px;
-    width: 21px;
-    margin-left: 6px;
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20width%3D'18'%20height%3D'18'%20vi…20-9.000000)%20'%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E");
-    background-size: 21px auto;
 }
 
 .am-input-error .signatureTip + .am-input-error-extra {
