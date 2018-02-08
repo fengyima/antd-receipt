@@ -22,6 +22,7 @@ class App extends Component {
             <BrowserRouter>
                 <div className="App">
                     <Route exact path="/" component={WelCome} />
+                    <Route path="/index.html" component={WelCome} />
                     <Route path="/write" component={Write} />
                     <Route path="/agreement" component={Agreement} />
                     <Route path="/userAgr" component={UserAgr} />
