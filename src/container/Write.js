@@ -5,7 +5,7 @@ import "../css/receipt.css";
 
 import {RATE, PURPOST} from "../config/rate.config";
 import {regObj} from "../config/reg.config";
-import {dateFormat, isCanvasBlank, calcInterest} from "../lib/tools";
+import {dateFormat, isCanvasBlank, calcInterest, type} from "../lib/tools";
 import qs from "../lib/querystring";
 import Signature from "../lib/Signature";
 import "whatwg-fetch";
@@ -117,7 +117,10 @@ export default class Write extends Component {
             .then(json => {
                 Toast.hide();
                 if (json.status) {
-                    let datas = json.datas;``
+                    let datas = json.datas;
+                    if (type(datas) === "string") {
+                        datas = JSON.parse(datas);
+                    }
                     sessionStorage.setItem("iouNumber", datas.iouNumber);
                     this.callWeCahtConfig(datas, function(res) {
                         Toast.success("生成协议成功");
