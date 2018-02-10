@@ -12,7 +12,9 @@ import BorrowAgr from "./container/BorrowAgr";
 import qs from "./lib/querystring";
 let PAGE_INFO = qs.parse();
 sessionStorage.setItem("openId", PAGE_INFO.openId);
-document.domain = "xiexieyi.com";
+if (window.location.origin.indexOf("xiexieyi") !== -1) {
+    document.domain = "xiexieyi.com";
+}
 class App extends Component {
     constructor(props) {
         super(props);

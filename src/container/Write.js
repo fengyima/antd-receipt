@@ -126,9 +126,9 @@ export default class Write extends Component {
             });
     }
 
-    onPayCallBack(errMsg, iouNumber) {
+    onPayCallBack(errMsg) {
         let {history} = this.props;
-
+        let iouNumber = sessionStorage.getItem("iouNumber");
         if (errMsg === "get_brand_wcpay_request:ok") {
             Toast.success("生成协议成功");
             setTimeout(() => {
@@ -139,8 +139,8 @@ export default class Write extends Component {
         }
     }
 
-    getWCpay(data, callback) {
-        if (typeof WeixinJSBridge == "undefined") {
+    onBridgeReady(data, callback) {
+        return function() {
             window.WeixinJSBridge.invoke(
                 "getBrandWCPayRequest",
                 {
@@ -150,6 +150,15 @@ export default class Write extends Component {
                     callback(res.err_msg);
                 }
             );
+        };
+    }
+
+    getWCpay(data, callback) {
+        if (document.addEventListener) {
+            document.addEventListener("WeixinJSBridgeReady", this.onBridgeReady(data), false);
+        } else if (document.attachEvent) {
+            document.attachEvent("WeixinJSBridgeReady", this.onBridgeReady(data));
+            document.attachEvent("onWeixinJSBridgeReady", this.onBridgeReady(data));
         }
     }
 
