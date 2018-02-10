@@ -9,7 +9,7 @@ import Agreement from "./container/Agreement";
 import UserAgr from "./container/UserAgr";
 import ServiceAgr from "./container/ServiceAgr";
 import BorrowAgr from "./container/BorrowAgr";
-
+document.domain = "xiexieyi.com";
 class App extends Component {
     constructor(props) {
         super(props);

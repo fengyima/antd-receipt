@@ -1,19 +1,25 @@
 import React, {Component} from "react";
 import {Link} from "react-router-dom";
-import {List, InputItem, Picker, Checkbox, WhiteSpace, WingBlank, Button} from "antd-mobile";
+import {List, InputItem, Picker, Checkbox, WhiteSpace, WingBlank, Button, Toast} from "antd-mobile";
 import "../css/receipt.css";
 
 import {RATE, PURPOST} from "../config/rate.config";
 import {regObj} from "../config/reg.config";
 import {dateFormat, isCanvasBlank, calcInterest} from "../lib/tools";
+import qs from "../lib/querystring";
 import Signature from "../lib/Signature";
 import "whatwg-fetch";
+
+let PAGE_INFO = qs.parse();
+PAGE_INFO.appId = PAGE_INFO.appid;
+
+let cost = PAGE_INFO.count || 9.9;
 
 const AgreeItem = Checkbox.AgreeItem;
 
 const nowTimeStamp = Date.now();
 
-let signInstance;
+let signInstance = null;
 
 export default class Write extends Component {
     constructor(props) {
@@ -56,6 +62,12 @@ export default class Write extends Component {
     componentDidMount() {
         // this.postData();
         this.checkAllStatu();
+
+        if (signInstance instanceof Signature) {
+            signInstance = new Signature(this.refs.canvas);
+            signInstance.init();
+            signInstance.defaultImg(this.state.signatureStr);
+        }
     }
 
     postData() {
@@ -82,14 +94,16 @@ export default class Write extends Component {
                 borrowMoney: borrowerAmount,
                 borrowCycle: borrowerCycle,
                 interestRate: parseInt(rateValue, 10),
-                borrowDate: borrowDate,
-                repaymentDate: repaymentDate,
+                borrowDate: dateFormat(borrowDate, "YYYY-MM-dd"),
+                repaymentDate: dateFormat(repaymentDate, "YYYY-MM-dd"),
                 purpose: purpostValue,
                 serviceCharge: 9.9,
-                openId: "",
+                openId: PAGE_INFO.appId,
                 iouNumber: ""
             }
         };
+
+        Toast.loading("加载中");
 
         fetch("http://www.xiexieyi.com/mz/receiveMessage/iouService/createIou.do", {
             method: "POST",
@@ -101,11 +115,36 @@ export default class Write extends Component {
                 return res.json();
             })
             .then(json => {
-                let datas = json.datas;
-                sessionStorage.setItem("iouNumber", datas.iouNumber);
+                Toast.hide();
+                if (json.status) {
+                    let datas = json.datas;``
+                    sessionStorage.setItem("iouNumber", datas.iouNumber);
+                    this.callWeCahtConfig(datas, function(res) {
+                        Toast.success("生成协议成功");
+                        history.push(`/agreement?iouNumber=${datas.iouNumber}`);
+                    });
+                }
             });
+    }
 
-        // history.push("/write");
+    callWeCahtConfig(data, success) {
+        window.wx.config({
+            debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+            appId: PAGE_INFO.appId, // 必填，公众号的唯一标识
+            timestamp: data.timestamp, // 必填，生成签名的时间戳
+            nonceStr: data.nonceStr, // 必填，生成签名的随机串
+            signature: data.signature, // 必填，签名
+            jsApiList: ["chooseWXPay"] // 必填，需要使用的JS接口列表
+        });
+
+        this.callWxPay(data, success);
+    }
+
+    callWxPay(data, success) {
+        window.wx.chooseWXPay({
+            ...data,
+            success
+        });
     }
 
     onBorrowerAmount(borrowerAmount) {
@@ -190,8 +229,9 @@ export default class Write extends Component {
                 if (!signInstance) {
                     signInstance = new Signature(this.refs.canvas);
                     signInstance.init();
-                    signInstance.defaultImg(this.state.signatureStr);
                 }
+                signInstance.refleshStageInfo();
+                signInstance.defaultImg(this.state.signatureStr);
             }
         );
     }
@@ -266,7 +306,7 @@ export default class Write extends Component {
                     >
                         借款人
                     </InputItem>
-                    <div className="errTip">请输入2-8位的中文名字！</div>
+                    <div className="errTip">请输入290-8位的中文名字！</div>
                     <InputItem
                         type="text"
                         placeholder="请输入身份证号"
@@ -274,7 +314,6 @@ export default class Write extends Component {
                         maxLength="18"
                         error={borrowerIdErr}
                         onBlur={v => {
-                            console.log(v);
                             this.checkAllStatu();
                             this.checkInput("borrowerId", v, "id");
                         }}
@@ -316,7 +355,7 @@ export default class Write extends Component {
                     >
                         出借人
                     </InputItem>
-                    <div className="errTip">请输入2-8位的中文名字！</div>
+                    <div className="errTip">请输入290-8位的中文名字！</div>
                 </List>
                 <List>
                     <InputItem
@@ -414,7 +453,7 @@ export default class Write extends Component {
                     <div className="am-list-item am-input-item am-list-item-middle am-list-item-middle-disable">
                         <div className="am-list-line">
                             <div className="am-input-label am-input-label-5">服务费用</div>
-                            <div className="signatureTip highlight">￥9.9</div>
+                            <div className="signatureTip highlight">￥{cost}</div>
                         </div>
                     </div>
                 </List>

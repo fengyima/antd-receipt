@@ -7,9 +7,6 @@ export default class Signature {
         this.el = el;
         this.canvas = el;
         this.cxt = this.canvas.getContext("2d");
-        this.stage_info = this.canvas.getBoundingClientRect();
-        this.width = this.canvas.width;
-        this.height = this.canvas.height;
         this.path = {
             beginX: 0,
             beginY: 0,
@@ -27,7 +24,13 @@ export default class Signature {
         };
         $img.src = src;
     }
+    refleshStageInfo() {
+        this.stage_info = this.canvas.getBoundingClientRect();
+    }
     init(btn) {
+        this.refleshStageInfo();
+        this.width = this.canvas.width;
+        this.height = this.canvas.height;
         this.canvas.addEventListener("touchstart", event => {
             preHandler(event);
             // document.addEventListener("touchstart", preHandler, false);
