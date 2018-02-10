@@ -122,9 +122,11 @@ export default class Write extends Component {
                         datas = JSON.parse(datas);
                     }
                     sessionStorage.setItem("iouNumber", datas.iouNumber);
-                    this.callWeCahtConfig(datas, function(res) {
-                        Toast.success("生成协议成功");
-                        history.push(`/agreement?iouNumber=${datas.iouNumber}`);
+                    this.callWeChatPay(datas, function(res) {
+                        // Toast.success("生成协议成功");
+                        setTimeout(() => {
+                            history.push(`/agreement?iouNumber=${datas.iouNumber}`);
+                        }, 1000);
                     });
                 }
             });
@@ -141,10 +143,10 @@ export default class Write extends Component {
             jsApiList: ["chooseWXPay"] // 必填，需要使用的JS接口列表
         });
 
-        this.callWxPay(data, success);
+        this.callWeChatPay(data, success);
     }
 
-    callWxPay(data, success) {
+    callWeChatPay(data, success) {
         window.wx.chooseWXPay({
             ...data,
             success
