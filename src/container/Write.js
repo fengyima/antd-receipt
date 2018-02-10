@@ -71,7 +71,6 @@ export default class Write extends Component {
     }
 
     postData() {
-        let {history} = this.props;
         let {
             borrowerName,
             borrowerId,
@@ -99,7 +98,7 @@ export default class Write extends Component {
                 purpose: purpostValue,
                 serviceCharge: 9.9,
                 openId: PAGE_INFO.openId,
-                iouNumber: ""
+                iouNumber: sessionStorage.getItem("iouNumber") || ""
             }
         };
 
@@ -122,14 +121,36 @@ export default class Write extends Component {
                         datas = JSON.parse(datas);
                     }
                     sessionStorage.setItem("iouNumber", datas.iouNumber);
-                    this.callWeChatPay(datas, function(res) {
-                        // Toast.success("生成协议成功");
-                        setTimeout(() => {
-                            history.push(`/agreement?iouNumber=${datas.iouNumber}`);
-                        }, 1000);
-                    });
+                    this.getWCpay(datas, this.onPayCallBack);
                 }
             });
+    }
+
+    onPayCallBack(errMsg, iouNumber) {
+        let {history} = this.props;
+
+        if (errMsg === "get_brand_wcpay_request:ok") {
+            Toast.success("生成协议成功");
+            setTimeout(() => {
+                history.push(`/agreement?iouNumber=${iouNumber}`);
+            }, 1000);
+        } else {
+            Toast.success("支付成功");
+        }
+    }
+
+    getWCpay(data, callback) {
+        if (typeof WeixinJSBridge == "undefined") {
+            window.WeixinJSBridge.invoke(
+                "getBrandWCPayRequest",
+                {
+                    ...data
+                },
+                function(res) {
+                    callback(res.err_msg);
+                }
+            );
+        }
     }
 
     callWeCahtConfig(data, success) {
