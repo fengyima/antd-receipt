@@ -11,7 +11,10 @@ import ServiceAgr from "./container/ServiceAgr";
 import BorrowAgr from "./container/BorrowAgr";
 import qs from "./lib/querystring";
 let PAGE_INFO = qs.parse();
-sessionStorage.setItem("openId", PAGE_INFO.openId);
+
+if (PAGE_INFO.openId) {
+    sessionStorage.setItem("openId", PAGE_INFO.openId);
+}
 if (window.location.origin.indexOf("xiexieyi") !== -1) {
     document.domain = "xiexieyi.com";
 }

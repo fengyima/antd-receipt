@@ -11,8 +11,6 @@ import Signature from "../lib/Signature";
 import "whatwg-fetch";
 import "vConsole";
 let PAGE_INFO = qs.parse();
-PAGE_INFO.openId = PAGE_INFO.openId || sessionStorage.getItem("openId");
-
 let cost = PAGE_INFO.count || 9.9;
 
 const AgreeItem = Checkbox.AgreeItem;
@@ -69,6 +67,7 @@ export default class Write extends Component {
     componentDidMount() {
         // this.postData();
         this.checkAllStatu();
+        PAGE_INFO.openId = PAGE_INFO.openId || sessionStorage.getItem("openId");
 
         if (signInstance instanceof Signature) {
             signInstance = new Signature(this.refs.canvas);
@@ -167,6 +166,7 @@ export default class Write extends Component {
         };
 
         return function() {
+            console.log(data);
             window.WeixinJSBridge.invoke(
                 "getBrandWCPayRequest",
                 {
@@ -181,17 +181,17 @@ export default class Write extends Component {
     }
 
     getWCpay(data, callback) {
-        if (typeof WeixinJSBridge === "undefined") {
-            // console.log(window.WeixinJSBridge);
-            if (document.addEventListener) {
-                document.addEventListener("WeixinJSBridgeReady", this.onBridgeReady(data), false);
-            } else if (document.attachEvent) {
-                document.attachEvent("WeixinJSBridgeReady", this.onBridgeReady(data));
-                document.attachEvent("onWeixinJSBridgeReady", this.onBridgeReady(data));
-            }
-        } else {
-            this.onBridgeReady(data);
-        }
+        window.onBridgeReady(data);
+        // if (typeof (WeixinJSBridge) === "undefined") {
+        //     if (document.addEventListener) {
+        //         document.addEventListener("WeixinJSBridgeReady", this.onBridgeReady(data), false);
+        //     } else if (document.attachEvent) {
+        //         document.attachEvent("WeixinJSBridgeReady", this.onBridgeReady(data));
+        //         document.attachEvent("onWeixinJSBridgeReady", this.onBridgeReady(data));
+        //     }
+        // } else {
+        //     this.onBridgeReady(data);
+        // }
     }
 
     callWeCahtConfig(data, success) {
