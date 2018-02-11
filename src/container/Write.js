@@ -138,8 +138,9 @@ export default class Write extends Component {
                     if (type(datas) === "string") {
                         datas = JSON.parse(datas);
                     }
+                    this.payDatas = datas;
                     sessionStorage.setItem("iouNumber", datas.iouNumber);
-                    this.getWCpay(datas, this.onPayCallBack);
+                    this.getWCpay(datas, this.onPayCallBack.bind(this));
                 }
             });
     }
@@ -157,8 +158,8 @@ export default class Write extends Component {
         }
     }
 
-    onBridgeReady(data, callback) {
-        return function() {
+    onBridgeReady(data = this.payDatas, callback) {
+        // return function() {
             // console.log(data);
             window.WeixinJSBridge.invoke(
                 "getBrandWCPayRequest",
@@ -170,7 +171,7 @@ export default class Write extends Component {
                     callback(res.err_msg);
                 }
             );
-        };
+        // };
     }
 
     getWCpay(data, callback) {
@@ -183,17 +184,17 @@ export default class Write extends Component {
             signType: data.signType, //微信签名方式：
             paySign: data.paySign //微信签名
         };
-        window.onBridgeReady(wxData);
-        // if (typeof (WeixinJSBridge) === "undefined") {
-        //     if (document.addEventListener) {
-        //         document.addEventListener("WeixinJSBridgeReady", this.onBridgeReady(data), false);
-        //     } else if (document.attachEvent) {
-        //         document.attachEvent("WeixinJSBridgeReady", this.onBridgeReady(data));
-        //         document.attachEvent("onWeixinJSBridgeReady", this.onBridgeReady(data));
-        //     }
-        // } else {
-        //     this.onBridgeReady(data);
-        // }
+        this.onBridgeReady(wxData,callback);
+        // window.onBridgeReady(wxData);
+        if (typeof (WeixinJSBridge) === "undefined") {
+            if (document.addEventListener) {
+                document.addEventListener("WeixinJSBridgeReady", this.onBridgeReady(data), false);
+            } else if (document.attachEvent) {
+                document.attachEvent("WeixinJSBridgeReady", this.onBridgeReady(data));
+                document.attachEvent("onWeixinJSBridgeReady", this.onBridgeReady(data));
+            }
+        } else {
+        }
     }
 
     callWeCahtConfig(data, success) {
