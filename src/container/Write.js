@@ -5,11 +5,11 @@ import "../css/receipt.css";
 
 import {RATE, PURPOST} from "../config/rate.config";
 import {regObj} from "../config/reg.config";
-import {dateFormat, isCanvasBlank, calcInterest, type} from "../lib/tools";
+import {dateFormat, isCanvasBlank, calcInterest, type, fillTimestamp} from "../lib/tools";
 import qs from "../lib/querystring";
 import Signature from "../lib/Signature";
 import "whatwg-fetch";
-
+import "vConsole";
 let PAGE_INFO = qs.parse();
 PAGE_INFO.openId = PAGE_INFO.openId || sessionStorage.getItem("openId");
 
@@ -21,11 +21,18 @@ const nowTimeStamp = Date.now();
 
 let signInstance = null;
 
+// let WeixinJSBridge = window.WeixinJSBridge;
+// console.log(WeixinJSBridge)
+
+const appId = "wxee20b8e3fb529804";
+
 export default class Write extends Component {
     constructor(props) {
         super(props);
         let borrowerCycle = sessionStorage.getItem("borrowerCycle");
         let repaymentDate = nowTimeStamp + ((borrowerCycle || 1) - 1) * 3600 * 24 * 1000;
+        let rateValue = sessionStorage.getItem("rateValue") || RATE[0][0].value;
+        let borrowerAmount = sessionStorage.getItem("borrowerAmount") || 0;
         this.state = {
             // borrowerName: "",
             borrowerNameErr: false,
@@ -50,10 +57,10 @@ export default class Write extends Component {
             borrowerName: sessionStorage.getItem("borrowerName"),
             borrowerId: sessionStorage.getItem("borrowerId"),
             lenders: sessionStorage.getItem("lenders"),
-            borrowerAmount: sessionStorage.getItem("borrowerAmount"),
+            borrowerAmount,
             borrowerCycle,
-            rateValue: sessionStorage.getItem("rateValue") || RATE[0][0].value,
-            interest: sessionStorage.getItem("interest"),
+            rateValue,
+            interest: calcInterest(rateValue, borrowerAmount, borrowerCycle).toFixed(2),
             purpostValue: sessionStorage.getItem("purpostValue") || PURPOST[0][0].value,
             signatureStr: sessionStorage.getItem("signatureStr") || ""
         };
@@ -104,6 +111,16 @@ export default class Write extends Component {
 
         Toast.loading("加载中");
 
+        // let datas = {
+        //     timestamp: "1518331789",
+        //     nonceStr: "42f9a641c5bc46798de70fa5f16cda60",
+        //     package: "prepay_id=wx201802111449494b06e975140378704676",
+        //     signType: "MD5",
+        //     paySign: "21EEEE411BBE90A8CF36DE5D6AFB0AAE",
+        //     iouNumber: "2018021114494900"
+        // };
+        // sessionStorage.setItem("iouNumber", datas.iouNumber);
+        // this.getWCpay(datas, this.onPayCallBack);
         fetch("http://www.xiexieyi.com/mz/receiveMessage/iouService/createIou.do", {
             method: "POST",
             mode: "cors",
@@ -140,13 +157,23 @@ export default class Write extends Component {
     }
 
     onBridgeReady(data, callback) {
+        let wxData = {
+            appId, //公众号名称，由商户传入
+            timeStamp: fillTimestamp(data, 10) * 1,
+            nonceStr: data.nonceStr, //随机串
+            package: data.package,
+            signType: data.signType, //微信签名方式：
+            paySign: data.paySign //微信签名
+        };
+
         return function() {
             window.WeixinJSBridge.invoke(
                 "getBrandWCPayRequest",
                 {
-                    ...data
+                    ...wxData
                 },
                 function(res) {
+                    // console.log(res);
                     callback(res.err_msg);
                 }
             );
@@ -154,18 +181,23 @@ export default class Write extends Component {
     }
 
     getWCpay(data, callback) {
-        if (document.addEventListener) {
-            document.addEventListener("WeixinJSBridgeReady", this.onBridgeReady(data), false);
-        } else if (document.attachEvent) {
-            document.attachEvent("WeixinJSBridgeReady", this.onBridgeReady(data));
-            document.attachEvent("onWeixinJSBridgeReady", this.onBridgeReady(data));
+        if (typeof WeixinJSBridge === "undefined") {
+            // console.log(window.WeixinJSBridge);
+            if (document.addEventListener) {
+                document.addEventListener("WeixinJSBridgeReady", this.onBridgeReady(data), false);
+            } else if (document.attachEvent) {
+                document.attachEvent("WeixinJSBridgeReady", this.onBridgeReady(data));
+                document.attachEvent("onWeixinJSBridgeReady", this.onBridgeReady(data));
+            }
+        } else {
+            this.onBridgeReady(data);
         }
     }
 
     callWeCahtConfig(data, success) {
         window.wx.config({
             debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
-            appId: "wxee20b8e3fb529804",
+            appId,
             openId: PAGE_INFO.openId, // 必填，公众号的唯一标识
             timestamp: data.timestamp, // 必填，生成签名的时间戳
             nonceStr: data.nonceStr, // 必填，生成签名的随机串
@@ -443,6 +475,7 @@ export default class Write extends Component {
                             this.setState({
                                 rateValue: value
                             });
+                            this.onRateChange(value);
                             sessionStorage.setItem("rateValue", value);
                         }}
                     >
