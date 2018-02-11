@@ -19,6 +19,8 @@ const nowTimeStamp = Date.now();
 
 let signInstance = null;
 
+window.Toast = Toast;
+
 // let WeixinJSBridge = window.WeixinJSBridge;
 // console.log(WeixinJSBridge)
 
@@ -156,21 +158,13 @@ export default class Write extends Component {
     }
 
     onBridgeReady(data, callback) {
-        let wxData = {
-            appId, //公众号名称，由商户传入
-            timeStamp: fillTimestamp(data, 10) * 1,
-            nonceStr: data.nonceStr, //随机串
-            package: data.package,
-            signType: data.signType, //微信签名方式：
-            paySign: data.paySign //微信签名
-        };
 
         return function() {
-            console.log(data);
+            // console.log(data);
             window.WeixinJSBridge.invoke(
                 "getBrandWCPayRequest",
                 {
-                    ...wxData
+                    ...data
                 },
                 function(res) {
                     // console.log(res);
@@ -181,7 +175,15 @@ export default class Write extends Component {
     }
 
     getWCpay(data, callback) {
-        window.onBridgeReady(data);
+        let wxData = {
+            appId, //公众号名称，由商户传入
+            timeStamp: fillTimestamp(data, 10) * 1,
+            nonceStr: data.nonceStr, //随机串
+            package: data.package,
+            signType: data.signType, //微信签名方式：
+            paySign: data.paySign //微信签名
+        };
+        window.onBridgeReady(wxData);
         // if (typeof (WeixinJSBridge) === "undefined") {
         //     if (document.addEventListener) {
         //         document.addEventListener("WeixinJSBridgeReady", this.onBridgeReady(data), false);
