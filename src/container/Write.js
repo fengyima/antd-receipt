@@ -158,7 +158,6 @@ export default class Write extends Component {
     }
 
     onBridgeReady(data, callback) {
-
         return function() {
             // console.log(data);
             window.WeixinJSBridge.invoke(
@@ -175,9 +174,10 @@ export default class Write extends Component {
     }
 
     getWCpay(data, callback) {
+
         let wxData = {
             appId, //公众号名称，由商户传入
-            timeStamp: fillTimestamp(data, 10) * 1,
+            timeStamp: fillTimestamp(data.timestamp, 10) + "",
             nonceStr: data.nonceStr, //随机串
             package: data.package,
             signType: data.signType, //微信签名方式：
